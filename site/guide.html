@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Руководство</title>
+    <link rel="icon" href="images/logo.png" type="image">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Руководство для начинающих: Создание Telegram-бота с гороскопом на Python</h1>
+    </header>
+
+
+<section id="introduction">
+    <h2 id="введение">Введение</h2>
+    <p>В этом руководстве мы шаг за шагом создадим Telegram-бота, который будет запрашивать знак зодиака и дату у пользователя и отправлять персональный гороскоп, используя публичное API.</p>
+</section>
+
+<section id="contents">
+    <h2 id="содержание">Содержание</h2>
+    <ol>
+        <li><a href="#%D1%88%D0%B0%D0%B3-1-%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-telegram-%D0%B1%D0%BE%D1%82%D0%B0-%D0%B8-%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%82%D0%BE%D0%BA%D0%B5%D0%BD%D0%B0">Создание Telegram-бота и получение токена</a></li>
+        <li><a href="#%D1%88%D0%B0%D0%B3-2-%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0-%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B5%D0%B3%D0%BE-%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F">Настройка рабочего окружения</a></li>
+        <li><a href="#%D1%88%D0%B0%D0%B3-3-%D0%BD%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%B4%D0%B0-%D0%B1%D0%BE%D1%82%D0%B0">Написание кода бота</a></li>
+        <li><a href="#%D1%88%D0%B0%D0%B3-4-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA-%D0%B8-%D1%82%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B1%D0%BE%D1%82%D0%B0">Запуск и тестирование бота</a></li>
+        <li><a href="#%D0%B0%D1%80%D1%85%D0%B8%D1%82%D0%B5%D0%BA%D1%82%D1%83%D1%80%D0%B0-%D0%B8-%D0%B2%D0%B8%D0%B7%D1%83%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F">Архитектура и визуализация</a></li>
+    </ol>
+</section>
+
+<section id="step1">
+    <h2 id="шаг-1-создание-telegram-бота-и-получение-токена">Шаг 1. Создание Telegram-бота и получение токена</h2>
+    <ol>
+        <li>В Telegram найдите бота <a href="https://core.telegram.org/file/811140253/1/tVdi9Kvdrp0.52332/original">BotFather</a>.</li>
+        <li>Отправьте команду /newbot.</li>
+        <li>Задайте имя и username (должен заканчиваться на bot, например myhorobot).</li>
+        <li>Скопируйте сгенерированный токен.</li>
+    </ol>
+</section>
+
+<section id="step2">
+    <h2 id="шаг-2-настройка-рабочего-окружения">Шаг 2. Настройка рабочего окружения</h2>
+    <h3 id="21-проверка-или-установка-python">2.1 Проверка или установка Python</h3>
+    <p>Проверьте, установлен ли Python:</p>
+    <p>python --version</p>
+    <p>Если нет — скачайте с <a href="https://python.org">официального сайта</a>.</p>
+    <h3 id="22-создание-виртуального-окружения">2.2 Создание виртуального окружения</h3>
+    <p>python -m venv venv</p>
+    <p>Активация:</p>
+    <ul>
+    <li>
+        <p>Windows:</p>
+        <p>venv\Scripts\activate</p>
+    </li>
+    <li>
+        <p>Linux/macOS:</p>
+        <p>source venv/bin/activate</p>
+    </li>
+    </ul>
+
+    <h3 id="23-установка-библиотек">2.3 Установка библиотек</h3>
+    <p>pip install pyTelegramBotAPI python-dotenv requests</p>
+
+    <h3 id="24-создание-файла-env">2.4 Создание файла .env</h3>
+    <p>BOT_TOKEN=ваш_токен_из_BotFather</p>
+</section>
+
+
+<section id="step3">
+    <h2 id="шаг-3-написание-кода-бота">Шаг 3. Написание кода бота</h2>
+    <p>Создайте файл main.py</p>
+    <pre><code class="language-python">from dotenv import load_dotenv
+    from pathlib import Path
+    from telebot import TeleBot, types
+    import os
+    import requests
+    </code></pre>
+    <h3 id="загрузка-токена-из-env">Загрузка токена из .env</h3>
+    <pre><code class="language-python">dotenv_path = Path(__file__).parent / &quot;.env&quot;
+    load_dotenv(dotenv_path=dotenv_path)
+    BOT_TOKEN = os.getenv(&#39;BOT_TOKEN&#39;)
+
+    if not BOT_TOKEN:
+        raise ValueError(&quot;BOT_TOKEN is not set. Check your .env file.&quot;)
+
+    bot = TeleBot(BOT_TOKEN)
+    </code></pre>
+    <h3 id="команды-бота">Команды бота</h3>
+    <pre><code class="language-python">bot.set_my_commands([
+        types.BotCommand(&quot;start&quot;, &quot;Начать работу с ботом&quot;),
+        types.BotCommand(&quot;hello&quot;, &quot;Поздороваться с ботом&quot;),
+        types.BotCommand(&quot;horoscope&quot;, &quot;Получить гороскоп&quot;),
+    ])
+    </code></pre>
+    <h3 id="список-допустимых-знаков">Список допустимых знаков</h3>
+    <pre><code class="language-python">ZODIAC_SIGNS = {
+        &quot;Овен&quot;: &quot;Aries&quot;,
+        &quot;Телец&quot;: &quot;Taurus&quot;,
+        &quot;Близнецы&quot;: &quot;Gemini&quot;,
+        &quot;Рак&quot;: &quot;Cancer&quot;,
+        &quot;Лев&quot;: &quot;Leo&quot;,
+        &quot;Дева&quot;: &quot;Virgo&quot;,
+        &quot;Весы&quot;: &quot;Libra&quot;,
+        &quot;Скорпион&quot;: &quot;Scorpio&quot;,
+        &quot;Стрелец&quot;: &quot;Sagittarius&quot;,
+        &quot;Козерог&quot;: &quot;Capricorn&quot;,
+        &quot;Водолей&quot;: &quot;Aquarius&quot;,
+        &quot;Рыбы&quot;: &quot;Pisces&quot;,
+    }
+
+    DAYS = [&quot;TODAY&quot;, &quot;TOMORROW&quot;, &quot;YESTERDAY&quot;]
+    </code></pre>
+    <h3 id="команда-start-и-hello">Команда /start и /hello</h3>
+    <pre><code class="language-python">@bot.message_handler(commands=[&#39;start&#39;, &#39;hello&#39;])
+    def send_welcome(message):
+        bot.send_message(message.chat.id, &quot;Привет! Я бот-гороскоп ✨\nНапиши /horoscope чтобы получить прогноз.&quot;)
+    </code></pre>
+    <h3 id="команда-horoscope">Команда /horoscope</h3>
+    <pre><code class="language-python">@bot.message_handler(commands=[&#39;horoscope&#39;])
+    def horoscope_handler(message):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        for sign in ZODIAC_SIGNS.keys():
+            markup.add(sign)
+        bot.send_message(message.chat.id, &quot;Выберите ваш знак зодиака:&quot;, reply_markup=markup)
+        bot.register_next_step_handler(message, ask_day)
+
+    def ask_day(message):
+        user_sign = message.text
+        if user_sign not in ZODIAC_SIGNS:
+            bot.send_message(message.chat.id, &quot;❗️ Неверный знак. Попробуйте снова с /horoscope&quot;)
+            return
+        sign_en = ZODIAC_SIGNS[user_sign]
+
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        markup.row(&quot;TODAY&quot;, &quot;TOMORROW&quot;, &quot;YESTERDAY&quot;)
+        bot.send_message(message.chat.id, &quot;Выберите день:&quot;, reply_markup=markup)
+        bot.register_next_step_handler(message, fetch_horoscope, sign_en)
+
+    def fetch_horoscope(message, sign_en):
+        day = message.text.upper()
+        if day not in DAYS:
+            bot.send_message(message.chat.id, &quot;❗️ Неверный день. Попробуйте снова с /horoscope&quot;)
+            return
+
+        horoscope = get_daily_horoscope(sign_en, day)
+
+        if &quot;error&quot; in horoscope:
+            bot.send_message(message.chat.id, &quot;🚫 Ошибка при получении гороскопа. Попробуйте позже.&quot;)
+            return
+
+        data = horoscope[&quot;data&quot;]
+        text = f&quot;🔮 *Гороскоп для {sign_en}*\n📅 *{data[&#39;date&#39;]}*\n\n_{data[&#39;horoscope_data&#39;]}_&quot;
+        bot.send_message(message.chat.id, text, parse_mode=&quot;Markdown&quot;)
+    </code></pre>
+    <h3 id="получение-данных-из-api">Получение данных из API</h3>
+    <pre><code class="language-python">def get_daily_horoscope(sign: str, day: str) -&gt; dict:
+        url = &quot;https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily&quot;
+        params = {&quot;sign&quot;: sign, &quot;day&quot;: day}
+        try:
+            response = requests.get(url, params=params, timeout=5)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            return {&quot;error&quot;: str(e)}
+    </code></pre>
+    <h3 id="обработчик-по-умолчанию">Обработчик по умолчанию</h3>
+    <pre><code class="language-python">@bot.message_handler(func=lambda msg: True)
+    def echo_all(message):
+        bot.reply_to(message, &quot;Неизвестная команда. Напишите /horoscope для гороскопа.&quot;)
+    </code></pre>
+    <h3 id="запуск">Запуск</h3>
+    <pre><code class="language-python">bot.infinity_polling()
+    </code></pre>
+</section>
+
+<section id="step4">
+    <h2 id="шаг-4-запуск-и-тестирование-бота">Шаг 4. Запуск и тестирование бота</h2>
+    <p>python main.py</p>
+    <p>Откройте Telegram, найдите вашего бота, напишите /start и следуйте подсказкам.</p>
+
+    <h2 id="архитектура-и-визуализация">Архитектура и визуализация</h2>
+    <h3 id="структура-проекта">Структура проекта</h3>
+    <p><pre>src/
+    ├── main.py
+    ├── .env</pre></p>
+
+    <h3 id="диаграмма-последовательности">Диаграмма последовательности</h3>
+    <p>sequenceDiagram
+        participant User
+        participant Bot
+        participant API</p>
+    <pre><code>User-&gt;&gt;Bot: /horoscope
+    Bot-&gt;&gt;User: Ввод знака
+    User-&gt;&gt;Bot: Aries
+    Bot-&gt;&gt;User: Ввод дня
+    User-&gt;&gt;Bot: Today
+    Bot-&gt;&gt;API: Запрос гороскопа
+    API--&gt;&gt;Bot: Гороскоп
+    Bot-&gt;&gt;User: Ответ с гороскопом
+    </code></pre>
+
+    <h3 id="потоковая-диаграмма">Потоковая диаграмма</h3>
+    <p><pre>flowchart TD
+
+        A[Пользователь вводит /horoscope] --&gt; B[Бот спрашивает знак]
+        B --&gt; C[Пользователь вводит знак]
+        C --&gt; D[Бот спрашивает дату]
+        D --&gt; E[Пользователь вводит дату]
+        E --&gt; F[Бот делает запрос к API]
+        F --&gt; G[Получает и выводит гороскоп]</pre></p>
+</section>
+
+
+
+
+    <footer>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="about.html">О проекте</a></li>
+            <li><a href="participants.html">Участники</a></li>
+            <li><a href="journal.html">Журнал</a></li>
+            <li><a href="resouces.html">Ресурсы</a></li>
+            <li><a href="guide.html">Руководство</a></li>
+        </ul>
+    </footer>    
+</body>
+
+</html>
